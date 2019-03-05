@@ -32,6 +32,6 @@ def gen(batch_size=cfg.batch_size, is_val=False):
             x[i] = preprocess_input(img, mode='tf')
             gt_file = os.path.join(cfg.data_dir,
                                    cfg.train_label_dir_name,
-                                   img_filename[:-4] + '_gt.npy')
+                                   os.path.splitext(img_filename)[0] + '_gt.npy')
             y[i] = np.load(gt_file)
         yield x, y

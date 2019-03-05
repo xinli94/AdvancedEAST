@@ -18,5 +18,5 @@ if __name__ == '__main__':
     for test_img_name, _ in zip(test_imgname_list,
                                 tqdm(range(len(test_imgname_list)))):
         img_path = os.path.join(image_test_dir, test_img_name)
-        txt_path = os.path.join(txt_test_dir, test_img_name[:-4] + '.txt')
+        txt_path = os.path.join(txt_test_dir, os.path.splitext(test_img_name)[0] + '.txt')
         predict_txt(east_detect, img_path, txt_path, cfg.pixel_threshold, True)

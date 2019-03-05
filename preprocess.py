@@ -1,3 +1,5 @@
+# coding:utf-8
+import glob
 import numpy as np
 from PIL import Image, ImageDraw
 import os
@@ -102,7 +104,7 @@ def preprocess():
     if not os.path.exists(show_act_image_dir):
         os.mkdir(show_act_image_dir)
 
-    o_img_list = os.listdir(origin_image_dir)
+    o_img_list = list(filter(lambda x: os.path.splitext(x)[-1] != '.txt', os.listdir(origin_image_dir)))
     print('found %d origin images.' % len(o_img_list))
     train_val_set = []
     for o_img_fname, _ in zip(o_img_list, tqdm(range(len(o_img_list)))):
@@ -116,7 +118,7 @@ def preprocess():
             # draw on the img
             draw = ImageDraw.Draw(show_gt_im)
             with open(os.path.join(origin_txt_dir,
-                                   o_img_fname[:-4] + '.txt'), 'r') as f:
+                                   os.path.splitext(o_img_fname)[0] + '.txt'), 'r', encoding='utf-8') as f:
                 anno_list = f.readlines()
             xy_list_array = np.zeros((len(anno_list), 4, 2))
             for anno, i in zip(anno_list, range(len(anno_list))):
@@ -155,7 +157,7 @@ def preprocess():
                 im.save(os.path.join(train_image_dir, o_img_fname))
             np.save(os.path.join(
                 train_label_dir,
-                o_img_fname[:-4] + '.npy'),
+                os.path.splitext(o_img_fname)[0] + '.npy'),
                 xy_list_array)
             if draw_gt_quad:
                 show_gt_im.save(os.path.join(show_gt_image_dir, o_img_fname))
@@ -169,11 +171,18 @@ def preprocess():
     print('found %d train labels.' % len(train_label_list))
 
     random.shuffle(train_val_set)
-    val_count = int(cfg.validation_split_ratio * len(train_val_set))
-    with open(os.path.join(data_dir, cfg.val_fname), 'w') as f_val:
-        f_val.writelines(train_val_set[:val_count])
+    if cfg.val_image_id == None:
+        val_count = int(cfg.validation_split_ratio * len(train_val_set))
+        train_set = train_val_set[:val_count]
+        val_set = train_val_set[val_count:]
+    else:
+        train_set = list(filter(lambda x: cfg.val_image_id not in x.split(',')[0].strip(), train_val_set))
+        val_set = list(filter(lambda x: cfg.val_image_id in x.split(',')[0].strip(), train_val_set))
+
     with open(os.path.join(data_dir, cfg.train_fname), 'w') as f_train:
-        f_train.writelines(train_val_set[val_count:])
+        f_train.writelines(train_set)
+    with open(os.path.join(data_dir, cfg.val_fname), 'w') as f_val:
+        f_val.writelines(val_set)
 
 
 if __name__ == '__main__':

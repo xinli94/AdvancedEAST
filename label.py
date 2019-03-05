@@ -109,7 +109,7 @@ def process_label(data_dir=cfg.data_dir):
         gt = np.zeros((height // cfg.pixel_size, width // cfg.pixel_size, 7))
         train_label_dir = os.path.join(data_dir, cfg.train_label_dir_name)
         xy_list_array = np.load(os.path.join(train_label_dir,
-                                             img_name[:-4] + '.npy'))
+                                             os.path.splitext(img_name)[0] + '.npy'))
         train_image_dir = os.path.join(data_dir, cfg.train_image_dir_name)
         with Image.open(os.path.join(train_image_dir, img_name)) as im:
             draw = ImageDraw.Draw(im)
@@ -167,7 +167,7 @@ def process_label(data_dir=cfg.data_dir):
                 im.save(os.path.join(act_image_dir, img_name))
         train_label_dir = os.path.join(data_dir, cfg.train_label_dir_name)
         np.save(os.path.join(train_label_dir,
-                             img_name[:-4] + '_gt.npy'), gt)
+                             os.path.splitext(img_name)[0] + '_gt.npy'), gt)
 
 
 if __name__ == '__main__':

@@ -91,7 +91,7 @@ def predict(east_detect, img_path, pixel_threshold, quiet=False):
                 print('quad invalid with vertex num less then 4.')
         quad_im.save(img_path + '_predict.jpg')
         if cfg.predict_write2txt and len(txt_items) > 0:
-            with open(img_path[:-4] + '.txt', 'w') as f_txt:
+            with open(os.path.splitext(img_path)[0] + '.txt', 'w') as f_txt:
                 f_txt.writelines(txt_items)
 
 
